@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Car Rental Availability
 
 ## Project Overview
@@ -193,4 +192,4 @@ Potential next steps for the project include:
 - Add API documentation with Swagger/OpenAPI
 =======
 # car-rental
->>>>>>> fe7a33765c7ba5ed330d59456b405dc4e553124b
+fe7a33765c7ba5ed330d59456b405dc4e553124b
