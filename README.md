@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Car Rental Availability
 
 ## Project Overview
@@ -190,3 +191,6 @@ Potential next steps for the project include:
 - Introduce additional providers through the existing abstraction
 - Expand test coverage for pricing and endpoint behavior
 - Add API documentation with Swagger/OpenAPI
+=======
+# car-rental
+>>>>>>> fe7a33765c7ba5ed330d59456b405dc4e553124b
