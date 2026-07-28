@@ -4,17 +4,45 @@ using CarRental.Api.Models;
 
 namespace CarRental.Api.Validators;
 
+/// <summary>
+/// Validates booking documents based on pickup city.
+/// </summary>
 public sealed class DocumentValidator : IDocumentValidator
 {
+    private static readonly HashSet<string> DomesticCities =
+    [
+        "Hyderabad",
+        "Bengaluru"
+    ];
+
+    private static readonly HashSet<string> InternationalCities =
+    [
+        "London",
+        "Dubai",
+        "Singapore"
+    ];
+
     public bool IsValid(BookingRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        return request.PickupLocation switch
+        if (string.IsNullOrWhiteSpace(request.PickupLocation))
         {
-            "Domestic" => request.DocumentType == DocumentType.NationalId,
-            "International" => request.DocumentType == DocumentType.Passport,
-            _ => false
-        };
+            return false;
+        }
+
+        var city = request.PickupLocation.Trim();
+
+        if (DomesticCities.Contains(city))
+        {
+            return request.DocumentType == DocumentType.NationalId;
+        }
+
+        if (InternationalCities.Contains(city))
+        {
+            return request.DocumentType == DocumentType.Passport;
+        }
+
+        return false;
     }
 }

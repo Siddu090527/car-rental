@@ -1,6 +1,8 @@
 using CarRental.Api.Interfaces;
+using CarRental.Api.Mappers;
 using CarRental.Api.Models;
 using CarRental.Api.Pricing;
+using CarRental.Api.Repositories;
 
 namespace CarRental.Api.Services;
 
@@ -9,16 +11,24 @@ public sealed class BookingService
     private readonly IReadOnlyCollection<ICarRentalProvider> providers;
     private readonly IDocumentValidator documentValidator;
     private readonly PricingService pricingService;
-    private readonly Dictionary<string, BookingDetails> bookings = new(StringComparer.OrdinalIgnoreCase);
+    private readonly IBookingRepository bookingRepository;
 
-    public BookingService(IEnumerable<ICarRentalProvider> providers, IDocumentValidator documentValidator, PricingService pricingService)
+    public BookingService(
+        IEnumerable<ICarRentalProvider> providers,
+        IDocumentValidator documentValidator,
+        PricingService pricingService,
+        IBookingRepository bookingRepository)
     {
         this.providers = providers.ToList();
         this.documentValidator = documentValidator;
         this.pricingService = pricingService;
+        this.bookingRepository = bookingRepository;
     }
 
-    public BookingResponse Book(BookingRequest request)
+    /// <summary>
+    /// Creates a new booking.
+    /// </summary>
+    public async Task<BookingResponse> BookAsync(BookingRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -26,29 +36,54 @@ public sealed class BookingService
 
         if (!documentValidator.IsValid(request))
         {
-            throw new InvalidOperationException("The supplied document is not valid for the selected pickup location.");
+            throw new InvalidOperationException(
+                "The supplied document is not valid for the selected pickup location.");
         }
 
-        var provider = providers.SingleOrDefault(currentProvider => currentProvider.ProviderType == request.Provider)
-            ?? throw new InvalidOperationException("The requested provider is not available.");
+        var provider = providers.SingleOrDefault(
+            p => p.ProviderType == request.Provider);
 
-        var priceBreakdown = pricingService.CalculatePrice(request.Provider, request.SelectedVehicle.DailyRate, request.PickupDate, request.ReturnDate);
+        if (provider is null)
+        {
+            throw new InvalidOperationException(
+                "The requested provider is not available.");
+        }
+
+        var priceBreakdown = pricingService.CalculatePrice(
+            request.Provider,
+            request.SelectedVehicle.DailyRate,
+            request.PickupDate,
+            request.ReturnDate);
+
         var response = provider.Book(request, priceBreakdown);
 
-        bookings[response.BookingReferenceNumber] = CreateBookingDetails(request, response);
+        var bookingDetails = CreateBookingDetails(request, response);
+
+        var bookingEntity = BookingMapper.ToEntity(bookingDetails);
+
+        await bookingRepository.CreateAsync(bookingEntity);
 
         return response;
     }
 
-    public BookingDetails? GetBookingDetails(string? reference)
+    /// <summary>
+    /// Returns booking details by booking reference.
+    /// </summary>
+    public async Task<BookingDetails?> GetBookingDetailsAsync(string? reference)
     {
         if (string.IsNullOrWhiteSpace(reference))
         {
             return null;
         }
 
-        bookings.TryGetValue(reference, out var details);
-        return details;
+        var booking = await bookingRepository.GetByReferenceAsync(reference);
+
+        if (booking is null)
+        {
+            return null;
+        }
+
+        return BookingMapper.ToModel(booking);
     }
 
     private static void ValidateBookingRequest(BookingRequest request)
@@ -63,13 +98,28 @@ public sealed class BookingService
             throw new InvalidOperationException("Pickup location is required.");
         }
 
-        if (request.SelectedVehicle is null || string.IsNullOrWhiteSpace(request.SelectedVehicle.Id))
+        if (request.SelectedVehicle is null)
         {
-            throw new InvalidOperationException("A selected vehicle is required.");
+            throw new InvalidOperationException(
+                "A selected vehicle is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.SelectedVehicle.Id))
+        {
+            throw new InvalidOperationException(
+                "Vehicle Id is required.");
+        }
+
+        if (request.ReturnDate <= request.PickupDate)
+        {
+            throw new InvalidOperationException(
+                "Return date must be after pickup date.");
         }
     }
 
-    private static BookingDetails CreateBookingDetails(BookingRequest request, BookingResponse response)
+    private static BookingDetails CreateBookingDetails(
+        BookingRequest request,
+        BookingResponse response)
     {
         return new BookingDetails
         {

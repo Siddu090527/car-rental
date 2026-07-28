@@ -3,21 +3,45 @@ using CarRental.Api.Models;
 
 namespace CarRental.Api.Pricing;
 
-public class PricingService
+/// <summary>
+/// Calculates rental pricing for supported providers.
+/// </summary>
+public sealed class PricingService
 {
-    public PriceBreakdown CalculatePrice(ProviderType providerType, decimal dailyRate, DateTime pickupDate, DateTime returnDate)
+    /// <summary>
+    /// Calculates the total rental price.
+    /// </summary>
+    public PriceBreakdown CalculatePrice(
+        ProviderType providerType,
+        decimal dailyRate,
+        DateTime pickupDate,
+        DateTime returnDate)
     {
-        var rentalNights = Math.Max(1, (returnDate.Date - pickupDate.Date).Days);
+        if (dailyRate <= 0)
+        {
+            throw new InvalidOperationException(
+                "Daily rate must be greater than zero.");
+        }
+
+        if (returnDate <= pickupDate)
+        {
+            throw new InvalidOperationException(
+                "Return date must be after pickup date.");
+        }
+
+        var rentalNights = (returnDate.Date - pickupDate.Date).Days;
         var dailySubtotal = dailyRate * rentalNights;
-        var surcharge = 0m;
+        decimal surcharge = 0m;
 
         if (providerType == ProviderType.BudgetWheels)
         {
             for (var day = pickupDate.Date; day < returnDate.Date; day = day.AddDays(1))
             {
-                if (day.DayOfWeek is DayOfWeek.Friday or DayOfWeek.Saturday or DayOfWeek.Sunday)
+                if (day.DayOfWeek == DayOfWeek.Friday ||
+                    day.DayOfWeek == DayOfWeek.Saturday ||
+                    day.DayOfWeek == DayOfWeek.Sunday)
                 {
-                    surcharge += dailyRate * 0.2m;
+                    surcharge += dailyRate * 0.20m;
                 }
             }
         }
@@ -27,7 +51,9 @@ public class PricingService
             DailyRate = dailyRate,
             RentalNights = rentalNights,
             Surcharge = surcharge,
-            TotalPrice = providerType == ProviderType.PremiumDrive ? dailySubtotal : dailySubtotal + surcharge
+            TotalPrice = providerType == ProviderType.PremiumDrive
+                ? dailySubtotal
+                : dailySubtotal + surcharge
         };
     }
 }
