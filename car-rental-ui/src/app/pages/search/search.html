@@ -1,0 +1,70 @@
+<div class="container">
+
+  <h1>Car Rental Search</h1>
+
+  <div class="search-form">
+
+    <div class="form-group">
+      <label>Pickup Location</label>
+      <input
+        type="text"
+        [(ngModel)]="pickupLocation"
+        placeholder="Enter pickup location" />
+    </div>
+
+    <div class="form-group">
+      <label>Pickup Date</label>
+      <input
+        type="date"
+        [(ngModel)]="pickupDate" />
+    </div>
+
+    <div class="form-group">
+      <label>Return Date</label>
+      <input
+        type="date"
+        [(ngModel)]="returnDate" />
+    </div>
+
+    <div class="form-group">
+      <label>Vehicle Category</label>
+
+      <select [(ngModel)]="category">
+        <option [ngValue]="undefined">All</option>
+        <option [ngValue]="0">Economy</option>
+        <option [ngValue]="1">Compact</option>
+        <option [ngValue]="2">SUV</option>
+        <option [ngValue]="3">Minivan</option>
+      </select>
+
+    </div>
+
+    <button (click)="search()">
+      Search Cars
+    </button>
+
+  </div>
+
+  <hr>
+
+  <div *ngIf="vehicles.length > 0">
+
+    <h2>Available Vehicles</h2>
+
+    <div
+      class="vehicle-card"
+      *ngFor="let vehicle of vehicles">
+
+      <h3>{{ vehicle.name }}</h3>
+
+      <p><strong>Provider:</strong> {{ vehicle.provider }}</p>
+
+      <p><strong>Daily Rate:</strong> ₹{{ vehicle.dailyRate }}</p>
+
+      <p><strong>Available:</strong> {{ vehicle.isAvailable ? 'Yes' : 'No' }}</p>
+
+    </div>
+
+  </div>
+
+</div>
