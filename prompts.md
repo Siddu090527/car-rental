@@ -1,111 +1,171 @@
-# GitHub Copilot Prompts
+# AI Prompt Log
 
-## Requirements Analysis
+## Overview
 
-### Objective
-Understand the car rental assignment requirements and define the solution scope.
+AI assistance was used as a development accelerator to generate boilerplate code, review architecture, improve code quality, and validate implementation. All generated code was manually reviewed, tested, and refined before inclusion in the final solution.
 
-### Prompt
-"Review the car rental availability specification and identify the required API endpoints, pricing rules, business rules, and validation behavior for a .NET 8 Minimal API solution."
+---
 
-### Outcome
-Established the core requirements for search, booking, pricing, and document validation.
+# Prompt 1
 
-## Project Structure
+## Goal
 
-### Objective
-Create the initial solution structure for the API project.
+Design a scalable architecture for a .NET 8 Car Rental API.
 
 ### Prompt
-"Create the project skeleton for a CarRental.Api solution with the required folders and empty C# files for models, enums, interfaces, providers, services, pricing, and validators."
+
+> Design a .NET 8 Minimal API for a Car Rental system using Repository Pattern, Provider Pattern, Entity Framework Core, SQL Server, Dependency Injection, and clean separation of concerns.
 
 ### Outcome
-Created the folder structure and initial class skeletons without implementation.
 
-## Domain Models
+Generated the initial project structure with:
 
-### Objective
-Define the core domain models needed for search and booking flows.
+- Minimal API
+- Services
+- Providers
+- Repository
+- Entity Framework Core
+
+---
+
+# Prompt 2
+
+## Goal
+
+Implement provider-specific pricing rules.
 
 ### Prompt
-"Generate the main C# model classes for car search requests, search responses, provider vehicles, booking requests, booking responses, booking details, and pricing breakdowns using file-scoped namespaces."
+
+> Implement PremiumDrive and BudgetWheels pricing rules according to the business requirements.
 
 ### Outcome
-Added the foundational models required by the API and services.
 
-## Provider Pattern
+Implemented:
 
-### Objective
-Implement the provider abstraction for multiple rental providers.
+PremiumDrive
+
+- Flat daily pricing
+
+BudgetWheels
+
+- Weekend surcharge
+- Friday
+- Saturday
+- Sunday
+
+---
+
+# Prompt 3
+
+## Goal
+
+Implement persistence.
 
 ### Prompt
-"Create an interface-based provider pattern for the rental application, including provider-specific implementations for PremiumDrive and BudgetWheels."
+
+> Create a repository layer using Entity Framework Core with SQL Server.
 
 ### Outcome
-Introduced ICarRentalProvider and provider implementations for both suppliers.
 
-## Services
+Implemented:
 
-### Objective
-Build the orchestration services for search and booking operations.
+- AppDbContext
+- Booking entity
+- Repository Pattern
+- Dependency Injection
+
+---
+
+# Prompt 4
+
+## Goal
+
+Improve maintainability.
 
 ### Prompt
-"Implement SearchService and BookingService to coordinate provider results, pricing, validation, and booking persistence in a minimal but extensible way."
+
+> Refactor the project using SOLID principles while preserving existing behaviour.
 
 ### Outcome
-Added service-layer orchestration for search and booking workflows.
 
-## Pricing
+Improved:
 
-### Objective
-Centralize pricing logic for both providers.
+- Separation of concerns
+- Dependency Injection
+- Mapper Pattern
+- Repository abstraction
+
+---
+
+# Prompt 5
+
+## Goal
+
+Increase code quality.
 
 ### Prompt
-"Implement a PricingService that calculates PremiumDrive flat-rate pricing and BudgetWheels weekend surcharge pricing while keeping the logic centralized."
+
+> Review all services and recommend production-ready improvements without changing business behaviour.
 
 ### Outcome
-Added consistent pricing calculations for both providers in one service.
 
-## Validation
+Added:
 
-### Objective
-Implement document validation behavior for domestic and international pickups.
+- Argument validation
+- Exception handling
+- Readability improvements
+- XML documentation
+
+---
+
+# Prompt 6
+
+## Goal
+
+Improve API usability.
 
 ### Prompt
-"Create a document validator that enforces domestic and international document rules and returns appropriate validation outcomes."
+
+> Review Swagger endpoints and recommend improvements for validation and API consistency.
 
 ### Outcome
-Added centralized validation logic for document acceptance rules.
 
-## Minimal API
+Improved:
 
-### Objective
-Expose the application through .NET 8 Minimal API endpoints.
+- Request validation
+- Response consistency
+- Global exception middleware
+
+---
+
+# Prompt 7
+
+## Goal
+
+Review against the case study.
 
 ### Prompt
-"Wire up Minimal API endpoints for search, booking, and booking lookup while keeping business logic out of Program.cs."
+
+> Compare the implementation against the official challenge and identify missing requirements.
 
 ### Outcome
-Implemented the required HTTP endpoints and delegated behavior to services.
 
-## Testing
+Completed:
 
-### Objective
-Validate the core business behavior with automated tests.
+- City-based validation
+- HTTP 422 responses
+- Documentation updates
+- Search improvements
 
-### Prompt
-"Create xUnit tests for search filtering and booking validation so the core rules are covered by automated tests."
+---
 
-### Outcome
-Added regression tests for unavailable BudgetWheels vehicles and invalid document validation.
+# Validation
 
-## Refactoring
+Every AI-generated change was verified by:
 
-### Objective
-Improve the solution structure while preserving behavior.
+- dotnet build
+- dotnet test
+- Swagger testing
+- SQL Server verification
 
-### Prompt
-"Refactor the application to improve SOLID principles, keep business logic out of Program.cs, centralize DI registration, and preserve current behavior."
-
-### Outcome
-Improved architecture clarity, service separation, and maintainability without changing the application behavior.
+No code was accepted without successful verification.

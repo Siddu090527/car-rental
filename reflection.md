@@ -1,33 +1,164 @@
-# Reflection
+# Project Reflection
 
-## Project Summary
+## Overview
 
-I built a .NET 8 Minimal API solution for the Car Rental Availability assignment with search, booking, and booking lookup capabilities. The project uses a provider-based architecture with PremiumDrive and BudgetWheels implementations, a shared provider interface, a pricing service, a document validator, and a small xUnit test suite.
+This project involved building a Car Rental API using .NET 8 Minimal API while following clean architecture principles and the functional requirements provided in the case study.
 
-## Architecture Decisions
+The primary objective was to build a maintainable, extensible, and production-oriented solution rather than simply making the APIs work.
 
-I chose a simple layered approach that keeps the entry point focused on HTTP mapping while moving business logic into services. I used Dependency Injection to register providers and services, and I structured the solution around a provider abstraction so future providers can be added without changing the core workflow.
+---
 
-## Trade-offs
+# What Went Well
 
-I kept the implementation intentionally lightweight and in-memory to stay aligned with the assignment scope. That made the project faster to build and easier to reason about, but it also means booking persistence and more advanced validation are not yet production-ready. I prioritized clarity and correctness over over-engineering.
+Several architectural practices significantly improved the quality of the implementation.
 
-## AI Usage
+## Clean Separation of Concerns
 
-I used GitHub Copilot throughout the development process to help scaffold the initial project structure, generate C# files, implement the service and provider layers, and produce supporting documentation. The AI assistance helped accelerate repetitive work and reduce setup overhead, especially in the early phases of the project.
+The project clearly separates responsibilities across:
 
-## Challenges Faced
+- Minimal API
+- Services
+- Providers
+- Repository
+- Entity Framework Core
+- SQL Server
 
-The main challenge was balancing the assignment requirements with the need to keep the solution simple and maintainable. I also had to be careful not to over-implement features that were not required, while still organizing the code in a way that would support future extension.
+This makes the application easier to maintain and extend.
 
-## What Went Well
+---
 
-The project structure is now clear, the core API endpoints are in place, and the main business rules are covered by tests. The provider abstraction and service responsibilities are fairly well separated, which makes the solution easier to understand and extend.
+## Provider Pattern
 
-## What I Would Improve With More Time
+Using the Provider Pattern allowed PremiumDrive and BudgetWheels to implement independent business rules without affecting each other.
 
-With more time, I would add stronger input validation, richer error models, more comprehensive test coverage, and persistent storage for bookings. I would also add OpenAPI documentation and further refine the separation between domain models and API-facing DTOs.
+Adding a third provider would require only implementing the provider interface and registering it with dependency injection.
 
-## Lessons Learned
+---
 
-I learned that good architecture is not only about correctness but also about keeping responsibilities clearly separated. A small project benefits a lot from a clean service boundary, clear DI setup, and a simple provider abstraction. I also learned that documentation and test coverage are just as important as implementation when delivering a complete solution.
+## Repository Pattern
+
+The repository abstracts database access from the business layer.
+
+Business logic remains inside the services while persistence is isolated in the repository.
+
+---
+
+## Entity Framework Core
+
+Entity Framework Core simplified persistence and reduced boilerplate code while supporting asynchronous database operations.
+
+---
+
+## Dependency Injection
+
+Dependency Injection improved testability and reduced coupling between components.
+
+---
+
+# Challenges Faced
+
+Several implementation challenges were encountered during development.
+
+## SQL Server Integration
+
+Initial integration required configuring DbContext, dependency injection, and repository classes correctly before persistence worked as expected.
+
+---
+
+## Unit Test Compatibility
+
+Introducing asynchronous repository methods required updating the services and fake repository while ensuring all existing unit tests continued to pass.
+
+---
+
+## Document Validation
+
+The initial implementation validated only "Domestic" and "International".
+
+The solution was later updated to use actual cities:
+
+Domestic
+
+- Hyderabad
+- Bengaluru
+
+International
+
+- London
+- Dubai
+- Singapore
+
+This better aligns with the case study requirements.
+
+---
+
+## Exception Handling
+
+Implementing a global exception middleware simplified API responses and centralised error handling.
+
+---
+
+# Design Decisions
+
+The following architectural decisions were made intentionally.
+
+## Repository Pattern
+
+Used to isolate persistence from business logic.
+
+---
+
+## Provider Pattern
+
+Allows each rental provider to implement independent pricing and booking behaviour.
+
+---
+
+## Mapper Pattern
+
+Separates database entities from API models, reducing coupling between persistence and business logic.
+
+---
+
+## Async Repository
+
+Database operations use asynchronous methods to improve scalability.
+
+---
+
+# Lessons Learned
+
+This project reinforced several software engineering principles.
+
+- Keep business logic separate from persistence.
+- Use dependency injection to improve maintainability.
+- Prefer composition over conditional logic.
+- Validate inputs early.
+- Write unit tests before large refactoring.
+- Verify every change with build and automated tests.
+
+---
+
+# Future Improvements
+
+Potential enhancements include:
+
+- JWT Authentication
+- Role-based Authorization
+- Serilog logging
+- Docker support
+- Azure deployment
+- CI/CD pipeline
+- Distributed caching
+- Health checks
+- API versioning
+- Pagination and filtering
+- OpenTelemetry monitoring
+
+---
+
+# Conclusion
+
+The final solution satisfies the functional requirements of the case study while following clean architecture principles and modern .NET development practices.
+
+The project remains extensible, testable, and suitable for future enhancements with minimal impact on the existing codebase.

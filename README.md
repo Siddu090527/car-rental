@@ -1,139 +1,227 @@
-# Car Rental Availability
+# Car Rental API
 
-## Project Overview
+## Overview
 
-Car Rental Availability is a .NET 8 Minimal API application that provides a unified car rental search and booking experience by integrating multiple rental providers through a common abstraction. The solution demonstrates provider-based design, dependency injection, and a simple in-memory booking flow.
+Car Rental API is a .NET 8 Minimal API application that allows customers to search available rental vehicles, calculate rental pricing, validate booking documents, create bookings, and retrieve booking details.
+
+The application follows Clean Architecture principles and uses Repository Pattern, Provider Pattern, Dependency Injection, Entity Framework Core, and SQL Server for persistence.
+
+---
 
 ## Features
 
-- Search available rental vehicles through a unified API
-- Book a vehicle using a provider-backed workflow
-- Retrieve booking details by reference
-- Support provider-specific pricing rules
-- Filter out unavailable BudgetWheels vehicles from search results
-- Validate documents based on pickup location
-- Return appropriate HTTP status codes for validation and request errors
+- Search available vehicles
+- Book rental vehicles
+- Retrieve booking details
+- SQL Server persistence
+- Swagger/OpenAPI support
+- Entity Framework Core
+- Repository Pattern
+- Provider Pattern
+- Async programming
+- Global Exception Middleware
+- Unit Tests
 
-## Architecture
-
-The application follows a simple layered structure:
-
-- Minimal API endpoints in the application entry point
-- Search and booking services for orchestration
-- Provider implementations for PremiumDrive and BudgetWheels
-- A shared provider interface for extensibility
-- A pricing service for pricing calculations
-- A document validator for document rules
-
-## Project Structure
-
-```text
-CarRental.Api/
-├── Common/
-├── Enums/
-├── Extensions/
-├── Interfaces/
-├── Mappings/
-├── Models/
-├── Pricing/
-├── Providers/
-├── Services/
-└── Validators/
-
-CarRental.Tests/
-└── UnitTest1.cs
-```
+---
 
 ## Technology Stack
 
-- .NET 8
-- C#
-- ASP.NET Core Minimal API
-- xUnit
+| Technology | Version |
+|------------|---------|
+| .NET | 8 |
+| ASP.NET Core Minimal API | 8 |
+| Entity Framework Core | 8 |
+| SQL Server | 2022 |
+| Swagger / OpenAPI | Latest |
+| xUnit | Latest |
+
+---
+
+## Project Structure
+
+```
+CarRental.Api
+│
+├── Data
+│   └── AppDbContext.cs
+│
+├── Entities
+│   └── Booking.cs
+│
+├── Extensions
+│   └── ServiceCollectionExtensions.cs
+│
+├── Interfaces
+│
+├── Mappers
+│   └── BookingMapper.cs
+│
+├── Middleware
+│   └── ExceptionMiddleware.cs
+│
+├── Models
+│
+├── Pricing
+│   └── PricingService.cs
+│
+├── Providers
+│   ├── PremiumDriveProvider.cs
+│   └── BudgetWheelsProvider.cs
+│
+├── Repositories
+│   ├── IBookingRepository.cs
+│   └── BookingRepository.cs
+│
+├── Services
+│   ├── BookingService.cs
+│   └── SearchService.cs
+│
+├── Validators
+│   └── DocumentValidator.cs
+│
+└── Program.cs
+```
+
+---
+
+## Architecture
+
+The application uses the following design patterns:
+
+- Repository Pattern
+- Provider Pattern
 - Dependency Injection
+- Mapper Pattern
+- Minimal API
+- Async/Await
 
-## Prerequisites
+---
 
-Before running the application, make sure you have:
+## Business Rules
 
-- .NET 8 SDK installed
-- A terminal or command prompt
-- Access to the solution folder
+### PremiumDrive
 
-## Setup Instructions
+- Flat daily pricing
+- Comprehensive insurance
+- Free cancellation up to 48 hours before pickup
+- Vehicles are always available
 
-1. Clone or open the repository.
-2. Navigate to the solution root.
-3. Restore dependencies:
+### BudgetWheels
 
-```bash
-dotnet restore
+- Flat daily pricing
+- 20% surcharge for rentals on Friday, Saturday, and Sunday
+- Basic insurance
+- Vehicles may be unavailable
+- Non-refundable bookings
+
+---
+
+## Pricing Rules
+
+### PremiumDrive
+
+```
+Total Price = Daily Rate × Rental Nights
 ```
 
-4. Build the solution:
+### BudgetWheels
 
-```bash
-dotnet build
+```
+Total Price =
+(Daily Rate × Rental Nights)
++ Weekend Surcharge
 ```
 
-## Running the Application
+Weekend surcharge:
 
-Run the API from the solution root:
-
-```bash
-dotnet run --project CarRental.Api/CarRental.Api.csproj
+```
+20% of Daily Rate
+for each Friday, Saturday, and Sunday.
 ```
 
-The application will start the Minimal API and expose the endpoints described below.
+---
 
-## Running Unit Tests
+## Document Validation
 
-Run the test suite with:
+| Pickup Location | Required Document |
+|----------------|-------------------|
+| Domestic | National ID |
+| International | Passport |
 
-```bash
-dotnet test
+---
+
+## Database
+
+Database:
+
 ```
+CarRentalDb
+```
+
+Main table:
+
+```
+Bookings
+```
+
+Example:
+
+| Column |
+|---------|
+| BookingReferenceNumber |
+| DriverName |
+| PickupLocation |
+| PickupDate |
+| ReturnDate |
+| Provider |
+| VehicleId |
+| TotalPrice |
+| DocumentType |
+| DocumentNumber |
+| CancellationPolicy |
+| CreatedOn |
+
+---
 
 ## API Endpoints
 
-### Search vehicles
+### Health
 
-Endpoint:
-
-```http
-GET /cars/search?pickup=Domestic&from=2026-07-20&to=2026-07-24
+```
+GET /
 ```
 
-Query parameters:
+---
 
-- pickup: pickup location
-- from: pickup date
-- to: return date
-- category: optional vehicle category filter
+### Search Vehicles
 
-Example response:
-
-```json
-{
-  "vehicles": []
-}
+```
+GET /cars/search
 ```
 
-### Book a vehicle
+Example:
 
-Endpoint:
+```
+pickup=Domestic
+from=2026-08-01T10:00:00
+to=2026-08-03T10:00:00
+```
 
-```http
+---
+
+### Book Vehicle
+
+```
 POST /cars/book
 ```
 
-Example request body:
+Sample Request
 
 ```json
 {
-  "driverName": "Jane Doe",
+  "driverName": "Siddaiah",
   "documentType": 0,
-  "documentNumber": "N12345",
+  "documentNumber": "N123456789",
   "pickupLocation": "Domestic",
   "provider": 0,
   "selectedVehicle": {
@@ -145,51 +233,102 @@ Example request body:
     "isAvailable": true,
     "insuranceType": 1
   },
-  "pickupDate": "2026-07-20T00:00:00",
-  "returnDate": "2026-07-24T00:00:00"
+  "pickupDate": "2026-08-01T10:00:00",
+  "returnDate": "2026-08-03T10:00:00"
 }
 ```
 
-### Get booking details
+---
 
-Endpoint:
+### Retrieve Booking
 
-```http
+```
 GET /cars/booking/{reference}
 ```
 
 Example:
 
-```http
-GET /cars/booking/PD-12345
+```
+GET /cars/booking/PD-5D01C92B46B64E3DAED66BB65B54F16A
 ```
 
-## Business Rules
+---
 
-- PremiumDrive vehicles are always available.
-- BudgetWheels may return unavailable vehicles, and unavailable vehicles are excluded from search results.
-- Vehicle categories are normalized into common categories: Economy, Compact, SUV, and Minivan.
-- PremiumDrive uses flat daily pricing.
-- BudgetWheels applies weekend surcharge on Friday, Saturday, and Sunday.
-- Domestic pickup accepts National ID.
-- International pickup accepts Passport.
+## Running the Application
 
-## Assumptions
+### Restore
 
-- The application runs offline and uses in-memory booking storage.
-- No database persistence is implemented.
-- No authentication or authorization is included.
-- Provider responses are deterministic for this implementation.
+```bash
+dotnet restore
+```
 
-## Future Improvements
+### Build
 
-Potential next steps for the project include:
+```bash
+dotnet build
+```
 
-- Persist bookings in a database
-- Add richer request validation and error handling
-- Introduce additional providers through the existing abstraction
-- Expand test coverage for pricing and endpoint behavior
-- Add API documentation with Swagger/OpenAPI
-=======
-# car-rental
-fe7a33765c7ba5ed330d59456b405dc4e553124b
+### Run
+
+```bash
+dotnet run --project CarRental.Api
+```
+
+Swagger:
+
+```
+https://localhost:<port>/swagger
+```
+
+---
+
+## Running Tests
+
+```bash
+dotnet test
+```
+
+---
+
+## Error Handling
+
+The application uses a global exception middleware that returns consistent HTTP responses.
+
+Examples:
+
+- 400 Bad Request
+- 404 Not Found
+- 500 Internal Server Error
+
+---
+
+## Design Decisions
+
+- Repository Pattern separates persistence logic.
+- Provider Pattern enables support for multiple rental providers.
+- Entity Framework Core manages SQL Server persistence.
+- BookingMapper separates database entities from API models.
+- PricingService encapsulates provider-specific pricing rules.
+- DocumentValidator centralises booking validation rules.
+
+---
+
+## Future Enhancements
+
+- Authentication & Authorization
+- Logging (Serilog)
+- Docker support
+- Azure deployment
+- Pagination & filtering
+- Rate limiting
+- CI/CD pipeline
+- Caching
+- Monitoring & Health Checks
+
+---
+
+## Author
+
+**Siddaiah Shaik**
+
+.NET Full Stack Developer
