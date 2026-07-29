@@ -20,33 +20,44 @@ export class Booking {
 
   private readonly service = inject(CarRentalService);
 
-  bookingReference = '';
+  reference = '';
 
-  booking: BookingDetails | null = null;
+  booking?: BookingDetails;
 
   errorMessage = '';
+
+  loading = false;
 
   searchBooking(): void {
 
     this.errorMessage = '';
-    this.booking = null;
+    this.booking = undefined;
 
-    if (!this.bookingReference.trim()) {
-      this.errorMessage = 'Please enter a booking reference.';
+    if (!this.reference.trim()) {
+
+      this.errorMessage = 'Booking reference is required.';
+
       return;
+
     }
 
+    this.loading = true;
+
     this.service
-      .getBooking(this.bookingReference)
+      .getBooking(this.reference)
       .subscribe({
 
         next: response => {
+
+          this.loading = false;
 
           this.booking = response;
 
         },
 
         error: (error: HttpErrorResponse) => {
+
+          this.loading = false;
 
           console.error(error);
 

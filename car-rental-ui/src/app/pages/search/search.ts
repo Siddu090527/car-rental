@@ -33,15 +33,12 @@ export class Search {
 
   errorMessage = '';
 
+  loading = false;
+
+  hasSearched = false;
+
   bookingResponse: BookingResponse | null = null;
 
-  selectedVehicle?: ProviderVehicle;
-
-  driverName = '';
-
-  documentNumber = '';
-
-  // Booking form state
   showBookingForm = false;
 
   bookingVehicle?: ProviderVehicle;
@@ -52,11 +49,44 @@ export class Search {
 
   bookingDocumentType = DocumentType.NationalId;
 
+  selectedVehicle?: ProviderVehicle;
+
+  driverName = '';
+
+  documentNumber = '';
+
   search(): void {
 
     this.errorMessage = '';
+    this.loading = true;
+    this.hasSearched = true;
     this.bookingResponse = null;
+    this.showBookingForm = false;
     this.vehicles = [];
+
+    if (!this.pickupLocation.trim()) {
+      this.loading = false;
+      this.errorMessage = 'Pickup location is required.';
+      return;
+    }
+
+    if (!this.pickupDate) {
+      this.loading = false;
+      this.errorMessage = 'Pickup date is required.';
+      return;
+    }
+
+    if (!this.returnDate) {
+      this.loading = false;
+      this.errorMessage = 'Return date is required.';
+      return;
+    }
+
+    if (this.returnDate <= this.pickupDate) {
+      this.loading = false;
+      this.errorMessage = 'Return date must be after pickup date.';
+      return;
+    }
 
     this.service.searchCars({
       pickupLocation: this.pickupLocation,
@@ -69,15 +99,27 @@ export class Search {
 
       next: response => {
 
-        console.log('Search Response', response);
+        console.log('Search Response:', response);
 
-        this.vehicles = response.vehicles;
+        console.log('Vehicle Count:', response.vehicles.length);
+
+        console.log('Vehicles:', response.vehicles);
+
+        this.vehicles = [...response.vehicles];
+
+        console.log('After assignment:', this.vehicles);
+
+        this.loading = false;
+
+        this.loading = false;
 
       },
 
       error: (error: HttpErrorResponse) => {
 
         console.error(error);
+
+        this.loading = false;
 
         this.errorMessage =
           error.error?.message ??
@@ -89,6 +131,7 @@ export class Search {
     });
 
   }
+
     book(vehicle: ProviderVehicle): void {
 
     this.errorMessage = '';
@@ -105,10 +148,30 @@ export class Search {
 
   }
 
+  cancelBooking(): void {
+
+    this.showBookingForm = false;
+
+    this.bookingVehicle = undefined;
+
+    this.bookingDriverName = '';
+
+    this.bookingDocumentNumber = '';
+
+    this.bookingDocumentType = DocumentType.NationalId;
+
+    this.errorMessage = '';
+
+  }
+
   confirmBooking(): void {
 
     if (!this.bookingVehicle) {
+
+      this.errorMessage = 'No vehicle selected.';
+
       return;
+
     }
 
     if (!this.bookingDriverName.trim()) {
@@ -126,6 +189,10 @@ export class Search {
       return;
 
     }
+
+    this.loading = true;
+
+    this.errorMessage = '';
 
     const request: BookingRequest = {
 
@@ -156,6 +223,8 @@ export class Search {
 
         next: (response: BookingResponse) => {
 
+          this.loading = false;
+
           this.bookingResponse = response;
 
           this.selectedVehicle = this.bookingVehicle;
@@ -166,18 +235,20 @@ export class Search {
 
           this.showBookingForm = false;
 
-          this.errorMessage = '';
+          console.log('Booking Response:', response);
 
         },
 
         error: (error: HttpErrorResponse) => {
+
+          this.loading = false;
 
           console.error(error);
 
           this.errorMessage =
             error.error?.message ??
             error.error ??
-            error.message;
+            'Booking failed.';
 
         }
 

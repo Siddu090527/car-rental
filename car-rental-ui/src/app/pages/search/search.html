@@ -27,41 +27,59 @@
     </div>
 
     <div class="form-group">
+
       <label>Vehicle Category</label>
 
       <select [(ngModel)]="category">
-        <option [ngValue]="undefined">All</option>
-        <option [ngValue]="0">Economy</option>
-        <option [ngValue]="1">Compact</option>
-        <option [ngValue]="2">SUV</option>
-        <option [ngValue]="3">Minivan</option>
+
+        <option [ngValue]="undefined">
+          All
+        </option>
+
+        <option [ngValue]="0">
+          Economy
+        </option>
+
+        <option [ngValue]="1">
+          Compact
+        </option>
+
+        <option [ngValue]="2">
+          SUV
+        </option>
+
+        <option [ngValue]="3">
+          Minivan
+        </option>
+
       </select>
 
     </div>
 
-    <button (click)="search()">
-      Search Cars
+    <button
+      type="button"
+      (click)="search()"
+      [disabled]="loading">
+
+      {{ loading ? 'Searching...' : 'Search Cars' }}
+
     </button>
 
   </div>
 
   <hr>
 
-  <!-- Error -->
-
   <div
-    *ngIf="errorMessage"
-    class="error">
+    class="error"
+    *ngIf="errorMessage">
 
     {{ errorMessage }}
 
   </div>
 
-  <!-- Booking Form -->
-
   <div
-    *ngIf="showBookingForm"
-    class="booking-form">
+    class="booking-form"
+    *ngIf="showBookingForm">
 
     <h2>Book Vehicle</h2>
 
@@ -71,19 +89,7 @@
 
       <input
         type="text"
-        [(ngModel)]="bookingDriverName"
-        placeholder="Enter driver name">
-
-    </div>
-
-    <div class="form-group">
-
-      <label>Document Number</label>
-
-      <input
-        type="text"
-        [(ngModel)]="bookingDocumentNumber"
-        placeholder="Enter document number">
+        [(ngModel)]="bookingDriverName">
 
     </div>
 
@@ -106,25 +112,46 @@
 
     </div>
 
-    <button
-      class="book-btn"
-      (click)="confirmBooking()">
+    <div class="form-group">
 
-      Confirm Booking
+      <label>Document Number</label>
 
-    </button>
+      <input
+        type="text"
+        [(ngModel)]="bookingDocumentNumber">
+
+    </div>
+
+    <div class="button-group">
+
+      <button
+        type="button"
+        class="book-btn"
+        (click)="confirmBooking()"
+        [disabled]="loading">
+
+        {{ loading ? 'Booking...' : 'Confirm Booking' }}
+
+      </button>
+
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="cancelBooking()">
+
+        Cancel
+
+      </button>
+
+    </div>
 
   </div>
 
-  <!-- Booking Success -->
-
   <div
-    *ngIf="bookingResponse"
-    class="booking-success">
+    class="booking-success"
+    *ngIf="bookingResponse">
 
-    <h2>
-      ✅ Booking Successful
-    </h2>
+    <h2>Booking Successful</h2>
 
     <table>
 
@@ -149,16 +176,6 @@
       </tr>
 
       <tr>
-        <td><strong>Pickup Date</strong></td>
-        <td>{{ pickupDate }}</td>
-      </tr>
-
-      <tr>
-        <td><strong>Return Date</strong></td>
-        <td>{{ returnDate }}</td>
-      </tr>
-
-      <tr>
         <td><strong>Total Price</strong></td>
         <td>₹{{ bookingResponse.totalPrice }}</td>
       </tr>
@@ -172,11 +189,13 @@
 
   </div>
 
-  <!-- Search Results -->
+    <!-- Search Results -->
 
   <div *ngIf="vehicles.length > 0">
 
-    <h2>Available Vehicles</h2>
+    <h2>
+      Available Vehicles ({{ vehicles.length }})
+    </h2>
 
     <div
       class="vehicle-card"
@@ -191,7 +210,21 @@
 
       <p>
         <strong>Category:</strong>
-        {{ vehicle.category }}
+
+        <span [ngSwitch]="vehicle.category">
+
+          <span *ngSwitchCase="0">Economy</span>
+
+          <span *ngSwitchCase="1">Compact</span>
+
+          <span *ngSwitchCase="2">SUV</span>
+
+          <span *ngSwitchCase="3">Minivan</span>
+
+          <span *ngSwitchDefault>Unknown</span>
+
+        </span>
+
       </p>
 
       <p>
@@ -200,19 +233,46 @@
       </p>
 
       <p>
+
         <strong>Insurance:</strong>
-        {{ vehicle.insuranceType }}
+
+        <span *ngIf="vehicle.insuranceType === 0">
+          Basic
+        </span>
+
+        <span *ngIf="vehicle.insuranceType === 1">
+          Comprehensive
+        </span>
+
       </p>
 
       <p>
-        <strong>Available:</strong>
-        {{ vehicle.isAvailable ? 'Yes' : 'No' }}
+
+        <strong>Status:</strong>
+
+        <span
+          style="color:green"
+          *ngIf="vehicle.isAvailable">
+
+          Available
+
+        </span>
+
+        <span
+          style="color:red"
+          *ngIf="!vehicle.isAvailable">
+
+          Not Available
+
+        </span>
+
       </p>
 
       <button
+        type="button"
         class="book-btn"
-        [disabled]="!vehicle.isAvailable"
-        (click)="book(vehicle)">
+        (click)="book(vehicle)"
+        [disabled]="!vehicle.isAvailable">
 
         Book Vehicle
 
@@ -222,15 +282,17 @@
 
   </div>
 
-  <!-- Empty State -->
+  <!-- Empty Result -->
 
   <div
-    *ngIf="vehicles.length === 0 && !errorMessage && !bookingResponse">
+    *ngIf="hasSearched && !loading && vehicles.length === 0 && !errorMessage">
 
-    <h3>No vehicles found.</h3>
+    <h2>No Vehicles Found</h2>
 
     <p>
-      Search using a pickup location and rental dates.
+
+      Try another location or select different dates.
+
     </p>
 
   </div>

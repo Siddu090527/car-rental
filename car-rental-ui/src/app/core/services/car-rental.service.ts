@@ -15,7 +15,7 @@ export class CarRentalService {
 
   private readonly http = inject(HttpClient);
 
-  // Backend API URL
+  // ASP.NET Core API
   private readonly apiUrl = 'http://localhost:5254';
 
   searchCars(request: CarSearchRequest): Observable<CarSearchResponse> {
@@ -26,27 +26,49 @@ export class CarRentalService {
       .set('to', request.returnDate);
 
     if (request.category !== undefined && request.category !== null) {
-      params = params.set('category', request.category.toString());
+      params = params.set(
+        'category',
+        request.category.toString()
+      );
     }
 
-    console.log('Calling API:', `${this.apiUrl}/cars/search`, params.toString());
+    console.log(
+      'Calling Search API',
+      `${this.apiUrl}/cars/search`,
+      params.toString()
+    );
 
     return this.http.get<CarSearchResponse>(
       `${this.apiUrl}/cars/search`,
       { params }
     );
+
   }
 
-  bookCar(request: BookingRequest): Observable<BookingResponse> {
+  bookCar(
+    request: BookingRequest
+  ): Observable<BookingResponse> {
+
+    console.log(
+      'Calling Booking API',
+      request
+    );
+
     return this.http.post<BookingResponse>(
       `${this.apiUrl}/cars/book`,
       request
     );
+
   }
 
-  getBooking(reference: string): Observable<BookingDetails> {
+  getBooking(
+    reference: string
+  ): Observable<BookingDetails> {
+
     return this.http.get<BookingDetails>(
       `${this.apiUrl}/cars/booking/${reference}`
     );
+
   }
+
 }

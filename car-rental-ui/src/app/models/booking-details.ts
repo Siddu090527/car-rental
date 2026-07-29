@@ -3,13 +3,12 @@ import { ProviderVehicle } from './provider-vehicle';
 export interface BookingDetails {
   bookingReferenceNumber: string;
   driverName: string;
-  documentType: number;
-  documentNumber: string;
+  provider: string;
   pickupLocation: string;
-  provider: number;
-  selectedVehicle: ProviderVehicle;
-  totalPrice: number;
-  cancellationPolicy: string;
   pickupDate: string;
   returnDate: string;
+  totalPrice: number;
+  cancellationPolicy: string;
+  documentType: string;
+  documentNumber: string;
 }
