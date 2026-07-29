@@ -1,10 +1,11 @@
 ﻿using CarRental.Api.Enums;
 using CarRental.Api.Interfaces;
 using CarRental.Api.Models;
-using CarRental.Api.Providers;
 using CarRental.Api.Pricing;
+using CarRental.Api.Providers;
 using CarRental.Api.Services;
 using CarRental.Api.Validators;
+using CarRental.Tests.Fakes;
 
 namespace CarRental.Tests;
 
@@ -26,11 +27,13 @@ public class UnitTest1
             ReturnDate = new DateTime(2026, 7, 24)
         });
 
-        Assert.DoesNotContain(response.Vehicles, vehicle => vehicle.Provider == "BudgetWheels" && vehicle.Id == "BW-003");
+        Assert.DoesNotContain(
+            response.Vehicles,
+            vehicle => vehicle.Provider == "BudgetWheels" && vehicle.Id == "BW-003");
     }
 
     [Fact]
-    public void BookingService_RejectsInvalidDocumentForDomesticPickup()
+    public async Task BookingService_RejectsInvalidDocumentForDomesticPickup()
     {
         var bookingService = new BookingService(
             new ICarRentalProvider[]
@@ -39,7 +42,8 @@ public class UnitTest1
                 new BudgetWheelsProvider()
             },
             new DocumentValidator(),
-            new PricingService());
+            new PricingService(),
+            new FakeBookingRepository());
 
         var request = new BookingRequest
         {
@@ -62,6 +66,7 @@ public class UnitTest1
             ReturnDate = new DateTime(2026, 7, 24)
         };
 
-        Assert.Throws<InvalidOperationException>(() => bookingService.Book(request));
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => bookingService.BookAsync(request));
     }
 }

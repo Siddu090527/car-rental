@@ -4,40 +4,41 @@ using CarRental.Api.Models;
 namespace CarRental.Api.Services;
 
 /// <summary>
-/// Handles vehicle searches across all providers.
+/// Handles vehicle search across all providers.
 /// </summary>
 public sealed class SearchService
 {
-    private readonly IReadOnlyCollection<ICarRentalProvider> _providers;
+    private readonly IReadOnlyCollection<ICarRentalProvider> providers;
 
     public SearchService(IEnumerable<ICarRentalProvider> providers)
     {
-        _providers = providers.ToList();
+        this.providers = providers.ToList();
     }
 
     /// <summary>
-    /// Searches vehicles from all providers.
+    /// Searches available vehicles.
     /// </summary>
     public CarSearchResponse Search(CarSearchRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var vehicles = _providers
+        var vehicles = providers
             .SelectMany(provider => provider.SearchVehicles(request))
-            .Where(vehicle => vehicle.IsAvailable)
             .ToList();
 
+        // Optional category filter.
         if (request.Category.HasValue)
         {
             vehicles = vehicles
-                .Where(vehicle => vehicle.Category == request.Category.Value)
+                .Where(v => v.Category == request.Category.Value)
                 .ToList();
         }
 
+        // Optional sorting by total price.
         if (request.SortByPrice)
         {
             vehicles = vehicles
-                .OrderBy(vehicle => vehicle.DailyRate)
+                .OrderBy(v => v.DailyRate)
                 .ToList();
         }
 

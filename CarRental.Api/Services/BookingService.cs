@@ -25,9 +25,6 @@ public sealed class BookingService
         this.bookingRepository = bookingRepository;
     }
 
-    /// <summary>
-    /// Creates a new booking.
-    /// </summary>
     public async Task<BookingResponse> BookAsync(BookingRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -40,14 +37,9 @@ public sealed class BookingService
                 "The supplied document is not valid for the selected pickup location.");
         }
 
-        var provider = providers.SingleOrDefault(
-            p => p.ProviderType == request.Provider);
-
-        if (provider is null)
-        {
-            throw new InvalidOperationException(
+        var provider = providers.SingleOrDefault(p => p.ProviderType == request.Provider)
+            ?? throw new InvalidOperationException(
                 "The requested provider is not available.");
-        }
 
         var priceBreakdown = pricingService.CalculatePrice(
             request.Provider,
@@ -66,9 +58,6 @@ public sealed class BookingService
         return response;
     }
 
-    /// <summary>
-    /// Returns booking details by booking reference.
-    /// </summary>
     public async Task<BookingDetails?> GetBookingDetailsAsync(string? reference)
     {
         if (string.IsNullOrWhiteSpace(reference))
@@ -98,22 +87,11 @@ public sealed class BookingService
             throw new InvalidOperationException("Pickup location is required.");
         }
 
-        if (request.SelectedVehicle is null)
+        if (request.SelectedVehicle is null ||
+            string.IsNullOrWhiteSpace(request.SelectedVehicle.Id))
         {
             throw new InvalidOperationException(
                 "A selected vehicle is required.");
-        }
-
-        if (string.IsNullOrWhiteSpace(request.SelectedVehicle.Id))
-        {
-            throw new InvalidOperationException(
-                "Vehicle Id is required.");
-        }
-
-        if (request.ReturnDate <= request.PickupDate)
-        {
-            throw new InvalidOperationException(
-                "Return date must be after pickup date.");
         }
     }
 
