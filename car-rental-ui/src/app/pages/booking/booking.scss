@@ -1,0 +1,63 @@
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #1976d2;
+  margin-bottom: 30px;
+}
+
+.lookup {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.lookup input {
+  padding: 10px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+}
+
+.lookup button {
+  width: 180px;
+  padding: 10px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.lookup button:hover {
+  background: #1565c0;
+}
+
+.error {
+  margin-top: 20px;
+  padding: 15px;
+  color: #c62828;
+  background: #ffebee;
+  border-radius: 6px;
+}
+
+.booking-card {
+  margin-top: 30px;
+  padding: 20px;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  background: #f4fff4;
+}
+
+.booking-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.booking-card td {
+  padding: 10px;
+  border-bottom: 1px solid #dddddd;
+}

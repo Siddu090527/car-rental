@@ -1,0 +1,81 @@
+<div class="container">
+
+  <h1>Booking Lookup</h1>
+
+  <div class="lookup">
+
+    <label>Booking Reference</label>
+
+    <input
+      type="text"
+      [(ngModel)]="bookingReference"
+      placeholder="Enter Booking Reference" />
+
+    <button
+      (click)="searchBooking()">
+      Search Booking
+    </button>
+
+  </div>
+
+  <div
+    class="error"
+    *ngIf="errorMessage">
+
+    {{ errorMessage }}
+
+  </div>
+
+  <div
+    class="booking-card"
+    *ngIf="booking">
+
+    <h2>Booking Details</h2>
+
+    <table>
+
+      <tr>
+        <td><strong>Reference</strong></td>
+        <td>{{ booking.bookingReferenceNumber }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Driver</strong></td>
+        <td>{{ booking.driverName }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Provider</strong></td>
+        <td>{{ booking.provider }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Vehicle</strong></td>
+        <td>{{ booking.selectedVehicle.name }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Pickup</strong></td>
+        <td>{{ booking.pickupDate }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Return</strong></td>
+        <td>{{ booking.returnDate }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Total Price</strong></td>
+        <td>₹{{ booking.totalPrice }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Cancellation</strong></td>
+        <td>{{ booking.cancellationPolicy }}</td>
+      </tr>
+
+    </table>
+
+  </div>
+
+</div>

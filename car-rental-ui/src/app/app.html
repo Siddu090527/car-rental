@@ -1,1 +1,34 @@
-<router-outlet></router-outlet>
+<nav class="navbar">
+
+  <div class="logo">
+    🚗 Car Rental System
+  </div>
+
+  <div class="menu">
+
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }">
+
+      Search Vehicles
+
+    </a>
+
+    <a
+      routerLink="/booking"
+      routerLinkActive="active">
+
+      Booking Lookup
+
+    </a>
+
+  </div>
+
+</nav>
+
+<div class="content">
+
+  <router-outlet></router-outlet>
+
+</div>

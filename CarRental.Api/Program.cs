@@ -8,22 +8,14 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register Swagger/OpenAPI services.
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register application services.
-builder.Services.AddCarRentalServices();
-
-// Register Entity Framework Core with SQL Server.
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Enable CORS for Angular application.
+// CORS for Angular
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AngularClient", policy =>
+    options.AddPolicy("Angular", policy =>
     {
         policy
             .WithOrigins("http://localhost:4200")
@@ -32,26 +24,34 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Application services
+builder.Services.AddCarRentalServices();
+
+// Entity Framework
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
+
 var app = builder.Build();
 
-// Global exception handling.
+// Global exception middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
-// Enable CORS.
-app.UseCors("AngularClient");
+// Enable CORS
+app.UseCors("Angular");
 
-// Enable Swagger.
+// Swagger
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// Health endpoint.
+// Root endpoint
 app.MapGet("/", () =>
     Results.Ok(new
     {
         message = "Car Rental API is running."
     }));
 
-// Search available vehicles.
+// Search vehicles
 app.MapGet("/cars/search",
 (
     string? pickup,
@@ -61,17 +61,17 @@ app.MapGet("/cars/search",
     SearchService searchService
 ) =>
 {
-    if (string.IsNullOrWhiteSpace(pickup) || from is null || to is null)
-    {
-        return Results.BadRequest(
-            "Pickup location, pickup date and return date are required.");
-    }
+    if (string.IsNullOrWhiteSpace(pickup))
+        return Results.BadRequest("Pickup location is required.");
+
+    if (from is null)
+        return Results.BadRequest("Pickup date is required.");
+
+    if (to is null)
+        return Results.BadRequest("Return date is required.");
 
     if (to <= from)
-    {
-        return Results.BadRequest(
-            "Return date must be after pickup date.");
-    }
+        return Results.BadRequest("Return date must be after pickup date.");
 
     var request = new CarSearchRequest
     {
@@ -86,7 +86,7 @@ app.MapGet("/cars/search",
     return Results.Ok(response);
 });
 
-// Create booking.
+// Create booking
 app.MapPost("/cars/book",
 async (
     BookingRequest request,
@@ -94,34 +94,16 @@ async (
 ) =>
 {
     if (request is null)
-    {
         return Results.BadRequest("Booking payload is required.");
-    }
 
     if (string.IsNullOrWhiteSpace(request.DriverName))
-    {
         return Results.BadRequest("Driver name is required.");
-    }
 
     if (string.IsNullOrWhiteSpace(request.PickupLocation))
-    {
         return Results.BadRequest("Pickup location is required.");
-    }
-
-    if (request.PickupDate == default)
-    {
-        return Results.BadRequest("Pickup date is required.");
-    }
-
-    if (request.ReturnDate == default)
-    {
-        return Results.BadRequest("Return date is required.");
-    }
 
     if (request.ReturnDate <= request.PickupDate)
-    {
         return Results.BadRequest("Return date must be after pickup date.");
-    }
 
     var response = await bookingService.BookAsync(request);
 
@@ -130,7 +112,7 @@ async (
         response);
 });
 
-// Get booking details.
+// Booking details
 app.MapGet("/cars/booking/{reference}",
 async (
     string reference,

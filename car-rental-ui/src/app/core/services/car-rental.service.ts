@@ -15,8 +15,8 @@ export class CarRentalService {
 
   private readonly http = inject(HttpClient);
 
-  // Update this port to match your .NET API launchSettings.json
-  private readonly apiUrl = 'https://localhost:7233';
+  // Backend API URL
+  private readonly apiUrl = 'http://localhost:5254';
 
   searchCars(request: CarSearchRequest): Observable<CarSearchResponse> {
 
@@ -25,9 +25,11 @@ export class CarRentalService {
       .set('from', request.pickupDate)
       .set('to', request.returnDate);
 
-    if (request.category !== undefined) {
-      params = params.set('category', request.category);
+    if (request.category !== undefined && request.category !== null) {
+      params = params.set('category', request.category.toString());
     }
+
+    console.log('Calling API:', `${this.apiUrl}/cars/search`, params.toString());
 
     return this.http.get<CarSearchResponse>(
       `${this.apiUrl}/cars/search`,

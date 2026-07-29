@@ -9,21 +9,21 @@
       <input
         type="text"
         [(ngModel)]="pickupLocation"
-        placeholder="Enter pickup location" />
+        placeholder="Enter pickup location">
     </div>
 
     <div class="form-group">
       <label>Pickup Date</label>
       <input
         type="date"
-        [(ngModel)]="pickupDate" />
+        [(ngModel)]="pickupDate">
     </div>
 
     <div class="form-group">
       <label>Return Date</label>
       <input
         type="date"
-        [(ngModel)]="returnDate" />
+        [(ngModel)]="returnDate">
     </div>
 
     <div class="form-group">
@@ -47,6 +47,133 @@
 
   <hr>
 
+  <!-- Error -->
+
+  <div
+    *ngIf="errorMessage"
+    class="error">
+
+    {{ errorMessage }}
+
+  </div>
+
+  <!-- Booking Form -->
+
+  <div
+    *ngIf="showBookingForm"
+    class="booking-form">
+
+    <h2>Book Vehicle</h2>
+
+    <div class="form-group">
+
+      <label>Driver Name</label>
+
+      <input
+        type="text"
+        [(ngModel)]="bookingDriverName"
+        placeholder="Enter driver name">
+
+    </div>
+
+    <div class="form-group">
+
+      <label>Document Number</label>
+
+      <input
+        type="text"
+        [(ngModel)]="bookingDocumentNumber"
+        placeholder="Enter document number">
+
+    </div>
+
+    <div class="form-group">
+
+      <label>Document Type</label>
+
+      <select
+        [(ngModel)]="bookingDocumentType">
+
+        <option [ngValue]="0">
+          National ID
+        </option>
+
+        <option [ngValue]="1">
+          Passport
+        </option>
+
+      </select>
+
+    </div>
+
+    <button
+      class="book-btn"
+      (click)="confirmBooking()">
+
+      Confirm Booking
+
+    </button>
+
+  </div>
+
+  <!-- Booking Success -->
+
+  <div
+    *ngIf="bookingResponse"
+    class="booking-success">
+
+    <h2>
+      ✅ Booking Successful
+    </h2>
+
+    <table>
+
+      <tr>
+        <td><strong>Booking Reference</strong></td>
+        <td>{{ bookingResponse.bookingReferenceNumber }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Driver</strong></td>
+        <td>{{ driverName }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Provider</strong></td>
+        <td>{{ selectedVehicle?.provider }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Vehicle</strong></td>
+        <td>{{ selectedVehicle?.name }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Pickup Date</strong></td>
+        <td>{{ pickupDate }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Return Date</strong></td>
+        <td>{{ returnDate }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Total Price</strong></td>
+        <td>₹{{ bookingResponse.totalPrice }}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Cancellation Policy</strong></td>
+        <td>{{ bookingResponse.cancellationPolicy }}</td>
+      </tr>
+
+    </table>
+
+  </div>
+
+  <!-- Search Results -->
+
   <div *ngIf="vehicles.length > 0">
 
     <h2>Available Vehicles</h2>
@@ -57,13 +184,54 @@
 
       <h3>{{ vehicle.name }}</h3>
 
-      <p><strong>Provider:</strong> {{ vehicle.provider }}</p>
+      <p>
+        <strong>Provider:</strong>
+        {{ vehicle.provider }}
+      </p>
 
-      <p><strong>Daily Rate:</strong> ₹{{ vehicle.dailyRate }}</p>
+      <p>
+        <strong>Category:</strong>
+        {{ vehicle.category }}
+      </p>
 
-      <p><strong>Available:</strong> {{ vehicle.isAvailable ? 'Yes' : 'No' }}</p>
+      <p>
+        <strong>Daily Rate:</strong>
+        ₹{{ vehicle.dailyRate }}
+      </p>
+
+      <p>
+        <strong>Insurance:</strong>
+        {{ vehicle.insuranceType }}
+      </p>
+
+      <p>
+        <strong>Available:</strong>
+        {{ vehicle.isAvailable ? 'Yes' : 'No' }}
+      </p>
+
+      <button
+        class="book-btn"
+        [disabled]="!vehicle.isAvailable"
+        (click)="book(vehicle)">
+
+        Book Vehicle
+
+      </button>
 
     </div>
+
+  </div>
+
+  <!-- Empty State -->
+
+  <div
+    *ngIf="vehicles.length === 0 && !errorMessage && !bookingResponse">
+
+    <h3>No vehicles found.</h3>
+
+    <p>
+      Search using a pickup location and rental dates.
+    </p>
 
   </div>
 
