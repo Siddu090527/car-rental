@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { environment } from '../../../environments/environment';
 import { CarSearchRequest } from '../../models/car-search-request';
 import { CarSearchResponse } from '../../models/car-search-response';
 import { BookingRequest } from '../../models/booking-request';
@@ -16,7 +17,7 @@ export class CarRentalService {
   private readonly http = inject(HttpClient);
 
   // ASP.NET Core API
-  private readonly apiUrl = 'http://localhost:5254';
+  private readonly apiUrl = environment.apiUrl;
 
   searchCars(request: CarSearchRequest): Observable<CarSearchResponse> {
 
@@ -32,12 +33,6 @@ export class CarRentalService {
       );
     }
 
-    console.log(
-      'Calling Search API',
-      `${this.apiUrl}/cars/search`,
-      params.toString()
-    );
-
     return this.http.get<CarSearchResponse>(
       `${this.apiUrl}/cars/search`,
       { params }
@@ -48,11 +43,6 @@ export class CarRentalService {
   bookCar(
     request: BookingRequest
   ): Observable<BookingResponse> {
-
-    console.log(
-      'Calling Booking API',
-      request
-    );
 
     return this.http.post<BookingResponse>(
       `${this.apiUrl}/cars/book`,

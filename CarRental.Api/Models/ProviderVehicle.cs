@@ -11,4 +11,5 @@ public class ProviderVehicle
     public decimal DailyRate { get; set; }
     public bool IsAvailable { get; set; }
     public InsuranceType InsuranceType { get; set; }
+    public string CancellationPolicy { get; set; } = string.Empty;
 }

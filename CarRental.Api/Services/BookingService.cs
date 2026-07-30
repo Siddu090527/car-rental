@@ -87,11 +87,34 @@ public sealed class BookingService
             throw new InvalidOperationException("Pickup location is required.");
         }
 
-        if (request.SelectedVehicle is null ||
-            string.IsNullOrWhiteSpace(request.SelectedVehicle.Id))
+        if (request.PickupDate == default)
+        {
+            throw new InvalidOperationException("Pickup date is required.");
+        }
+
+        if (request.ReturnDate == default)
+        {
+            throw new InvalidOperationException("Return date is required.");
+        }
+
+        if (request.ReturnDate <= request.PickupDate)
         {
             throw new InvalidOperationException(
-                "A selected vehicle is required.");
+                "Return date must be after pickup date.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.DocumentNumber))
+        {
+            throw new InvalidOperationException("Document number is required.");
+        }
+
+        if (request.SelectedVehicle is null ||
+            string.IsNullOrWhiteSpace(request.SelectedVehicle.Id) ||
+            string.IsNullOrWhiteSpace(request.SelectedVehicle.Name) ||
+            request.SelectedVehicle.DailyRate <= 0)
+        {
+            throw new InvalidOperationException(
+                "A selected vehicle with valid details is required.");
         }
     }
 

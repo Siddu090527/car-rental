@@ -5,8 +5,17 @@ using CarRental.Api.Middleware;
 using CarRental.Api.Models;
 using CarRental.Api.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog from configuration early so startup logs are captured.
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -32,98 +41,130 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-var app = builder.Build();
+// Health checks
+builder.Services.AddHealthChecks();
 
-// Global exception middleware
-app.UseMiddleware<ExceptionMiddleware>();
+try
+{
+    Log.Information("Starting Car Rental API");
 
-// Enable CORS
-app.UseCors("Angular");
+    var app = builder.Build();
 
-// Swagger
-app.UseSwagger();
-app.UseSwaggerUI();
-
-// Root endpoint
-app.MapGet("/", () =>
-    Results.Ok(new
+    using (var scope = app.Services.CreateScope())
     {
-        message = "Car Rental API is running."
-    }));
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var providerName = dbContext.Database.ProviderName;
 
-// Search vehicles
-app.MapGet("/cars/search",
-(
-    string? pickup,
-    DateTime? from,
-    DateTime? to,
-    VehicleCategory? category,
-    SearchService searchService
-) =>
-{
-    if (string.IsNullOrWhiteSpace(pickup))
-        return Results.BadRequest("Pickup location is required.");
+        if (!string.IsNullOrWhiteSpace(providerName) &&
+            providerName.Contains("Sqlite", StringComparison.OrdinalIgnoreCase))
+        {
+            dbContext.Database.EnsureCreated();
+        }
+        else
+        {
+            dbContext.Database.Migrate();
+        }
+    }
 
-    if (from is null)
-        return Results.BadRequest("Pickup date is required.");
+    // Global exception middleware
+    app.UseMiddleware<ExceptionMiddleware>();
 
-    if (to is null)
-        return Results.BadRequest("Return date is required.");
+    // Enable CORS
+    app.UseCors("Angular");
 
-    if (to <= from)
-        return Results.BadRequest("Return date must be after pickup date.");
+    // Swagger
+    app.UseSwagger();
+    app.UseSwaggerUI();
 
-    var request = new CarSearchRequest
+    // Health endpoint
+    app.MapHealthChecks("/health");
+
+    // Root endpoint
+    app.MapGet("/", () =>
+        Results.Ok(new
+        {
+            message = "Car Rental API is running."
+        }));
+
+    // Search vehicles
+    app.MapGet("/cars/search",
+    (
+        string? pickup,
+        DateTime? from,
+        DateTime? to,
+        VehicleCategory? category,
+        SearchService searchService
+    ) =>
     {
-        PickupLocation = pickup,
-        PickupDate = from.Value,
-        ReturnDate = to.Value,
-        Category = category
-    };
+        if (string.IsNullOrWhiteSpace(pickup))
+            return Results.BadRequest("Pickup location is required.");
 
-    var response = searchService.Search(request);
+        if (from is null)
+            return Results.BadRequest("Pickup date is required.");
 
-    return Results.Ok(response);
-});
+        if (to is null)
+            return Results.BadRequest("Return date is required.");
 
-// Create booking
-app.MapPost("/cars/book",
-async (
-    BookingRequest request,
-    BookingService bookingService
-) =>
+        if (to <= from)
+            return Results.BadRequest("Return date must be after pickup date.");
+
+        var request = new CarSearchRequest
+        {
+            PickupLocation = pickup,
+            PickupDate = from.Value,
+            ReturnDate = to.Value,
+            Category = category
+        };
+
+        var response = searchService.Search(request);
+
+        return Results.Ok(response);
+    });
+
+    // Create booking
+    app.MapPost("/cars/book",
+    async (
+        BookingRequest request,
+        BookingService bookingService
+    ) =>
+    {
+        // Transport-level validation only: ensure payload exists.
+        if (request is null)
+            return Results.BadRequest("Booking payload is required.");
+
+        // Delegate all business validation and orchestration to BookingService.
+        // BookingService throws InvalidOperationException for validation failures
+        // which is handled by the global ExceptionMiddleware.
+        var response = await bookingService.BookAsync(request);
+
+        return Results.Created(
+            $"/cars/booking/{response.BookingReferenceNumber}",
+            response);
+    });
+
+    // Booking details
+    app.MapGet("/cars/booking/{reference}",
+    async (
+        string reference,
+        BookingService bookingService
+    ) =>
+    {
+        var booking = await bookingService.GetBookingDetailsAsync(reference);
+
+        return booking is null
+            ? Results.NotFound()
+            : Results.Ok(booking);
+    });
+
+    app.Run();
+}
+catch (Exception ex)
 {
-    if (request is null)
-        return Results.BadRequest("Booking payload is required.");
-
-    if (string.IsNullOrWhiteSpace(request.DriverName))
-        return Results.BadRequest("Driver name is required.");
-
-    if (string.IsNullOrWhiteSpace(request.PickupLocation))
-        return Results.BadRequest("Pickup location is required.");
-
-    if (request.ReturnDate <= request.PickupDate)
-        return Results.BadRequest("Return date must be after pickup date.");
-
-    var response = await bookingService.BookAsync(request);
-
-    return Results.Created(
-        $"/cars/booking/{response.BookingReferenceNumber}",
-        response);
-});
-
-// Booking details
-app.MapGet("/cars/booking/{reference}",
-async (
-    string reference,
-    BookingService bookingService
-) =>
+    Log.Fatal(ex, "Application start-up failed");
+}
+finally
 {
-    var booking = await bookingService.GetBookingDetailsAsync(reference);
+    Log.CloseAndFlush();
+}
 
-    return booking is null
-        ? Results.NotFound()
-        : Results.Ok(booking);
-});
-
-app.Run();
+public partial class Program { }

@@ -183,21 +183,57 @@ booking
 
 # Running Backend
 
-```
+1. Open a terminal in `d:\car-rental`
+2. Restore packages and build the solution:
+
+```powershell
 dotnet restore
-
-dotnet build
-
-dotnet run
+ dotnet build CarRental.slnx
 ```
 
-Swagger
+3. Run the API project:
 
+```powershell
+dotnet run --project CarRental.Api\CarRental.Api.csproj
 ```
+
+4. Open Swagger:
+
+```text
 http://localhost:5254/swagger
 ```
 
 ---
+
+# Running Frontend
+
+1. Open a terminal in `d:\car-rental\car-rental-ui`
+2. Install dependencies if needed:
+
+```powershell
+npm install
+```
+
+3. Run the Angular app:
+
+```powershell
+npm start
+```
+
+4. Open the UI:
+
+```text
+http://localhost:4200
+```
+
+---
+
+# Notes
+
+- The Angular app calls the API at `http://localhost:5254`.
+- Ensure the backend is running before searching or booking vehicles.
+- The solution has clean architecture with provider-based search and booking services.
+
 
 # Running Angular
 

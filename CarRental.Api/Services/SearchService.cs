@@ -24,6 +24,7 @@ public sealed class SearchService
 
         var vehicles = providers
             .SelectMany(provider => provider.SearchVehicles(request))
+            .Where(v => v.IsAvailable)
             .ToList();
 
         // Optional category filter.

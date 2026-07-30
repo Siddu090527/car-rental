@@ -99,18 +99,7 @@ export class Search {
 
       next: response => {
 
-        console.log('Search Response:', response);
-
-        console.log('Vehicle Count:', response.vehicles.length);
-
-        console.log('Vehicles:', response.vehicles);
-
         this.vehicles = [...response.vehicles];
-
-        console.log('After assignment:', this.vehicles);
-
-        this.loading = false;
-
         this.loading = false;
 
       },
@@ -224,27 +213,17 @@ export class Search {
         next: (response: BookingResponse) => {
 
           this.loading = false;
-
           this.bookingResponse = response;
-
           this.selectedVehicle = this.bookingVehicle;
-
           this.driverName = this.bookingDriverName;
-
           this.documentNumber = this.bookingDocumentNumber;
-
           this.showBookingForm = false;
-
-          console.log('Booking Response:', response);
 
         },
 
         error: (error: HttpErrorResponse) => {
 
           this.loading = false;
-
-          console.error(error);
-
           this.errorMessage =
             error.error?.message ??
             error.error ??

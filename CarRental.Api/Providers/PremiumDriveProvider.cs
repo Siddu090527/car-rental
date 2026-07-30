@@ -12,10 +12,10 @@ public class PremiumDriveProvider : ICarRentalProvider
     {
         var vehicles = new List<ProviderVehicle>
         {
-            new() { Id = "PD-001", Name = "PremiumDrive Compact", Category = VehicleCategory.Compact, Provider = ProviderType.PremiumDrive.ToString(), DailyRate = 110m, IsAvailable = true, InsuranceType = InsuranceType.Comprehensive },
-            new() { Id = "PD-002", Name = "PremiumDrive Economy", Category = VehicleCategory.Economy, Provider = ProviderType.PremiumDrive.ToString(), DailyRate = 95m, IsAvailable = true, InsuranceType = InsuranceType.Comprehensive },
-            new() { Id = "PD-003", Name = "PremiumDrive SUV", Category = VehicleCategory.SUV, Provider = ProviderType.PremiumDrive.ToString(), DailyRate = 140m, IsAvailable = true, InsuranceType = InsuranceType.Comprehensive },
-            new() { Id = "PD-004", Name = "PremiumDrive Minivan", Category = VehicleCategory.Minivan, Provider = ProviderType.PremiumDrive.ToString(), DailyRate = 160m, IsAvailable = true, InsuranceType = InsuranceType.Comprehensive }
+            new() { Id = "PD-001", Name = "PremiumDrive Compact", Category = VehicleCategory.Compact, Provider = ProviderType.PremiumDrive.ToString(), DailyRate = 110m, IsAvailable = true, InsuranceType = InsuranceType.Comprehensive, CancellationPolicy = "Free cancellation up to 48 hours before pickup" },
+            new() { Id = "PD-002", Name = "PremiumDrive Economy", Category = VehicleCategory.Economy, Provider = ProviderType.PremiumDrive.ToString(), DailyRate = 95m, IsAvailable = true, InsuranceType = InsuranceType.Comprehensive, CancellationPolicy = "Free cancellation up to 48 hours before pickup" },
+            new() { Id = "PD-003", Name = "PremiumDrive SUV", Category = VehicleCategory.SUV, Provider = ProviderType.PremiumDrive.ToString(), DailyRate = 140m, IsAvailable = true, InsuranceType = InsuranceType.Comprehensive, CancellationPolicy = "Free cancellation up to 48 hours before pickup" },
+            new() { Id = "PD-004", Name = "PremiumDrive Minivan", Category = VehicleCategory.Minivan, Provider = ProviderType.PremiumDrive.ToString(), DailyRate = 160m, IsAvailable = true, InsuranceType = InsuranceType.Comprehensive, CancellationPolicy = "Free cancellation up to 48 hours before pickup" }
         };
 
         return request.Category.HasValue

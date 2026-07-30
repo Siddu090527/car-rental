@@ -12,7 +12,7 @@ namespace CarRental.Tests;
 public class UnitTest1
 {
     [Fact]
-    public void SearchService_ExcludesUnavailableBudgetWheelsVehicles()
+    public void SearchService_FiltersOutUnavailableBudgetWheelsVehicles()
     {
         var searchService = new SearchService(new ICarRentalProvider[]
         {
@@ -29,7 +29,11 @@ public class UnitTest1
 
         Assert.DoesNotContain(
             response.Vehicles,
-            vehicle => vehicle.Provider == "BudgetWheels" && vehicle.Id == "BW-003");
+            vehicle => vehicle.Provider == "BudgetWheels" && vehicle.Id == "BW-003" && vehicle.IsAvailable == false);
+
+        Assert.All(
+            response.Vehicles,
+            vehicle => Assert.True(vehicle.IsAvailable, "SearchService should filter unavailable vehicles before returning results."));
     }
 
     [Fact]

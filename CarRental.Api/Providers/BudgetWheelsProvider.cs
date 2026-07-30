@@ -12,17 +12,15 @@ public class BudgetWheelsProvider : ICarRentalProvider
     {
         var vehicles = new List<ProviderVehicle>
         {
-            new() { Id = "BW-001", Name = "BudgetWheels Economy", Category = VehicleCategory.Economy, Provider = ProviderType.BudgetWheels.ToString(), DailyRate = 70m, IsAvailable = true, InsuranceType = InsuranceType.Basic },
-            new() { Id = "BW-002", Name = "BudgetWheels Compact", Category = VehicleCategory.Compact, Provider = ProviderType.BudgetWheels.ToString(), DailyRate = 80m, IsAvailable = true, InsuranceType = InsuranceType.Basic },
-            new() { Id = "BW-003", Name = "BudgetWheels SUV", Category = VehicleCategory.SUV, Provider = ProviderType.BudgetWheels.ToString(), DailyRate = 100m, IsAvailable = false, InsuranceType = InsuranceType.Basic },
-            new() { Id = "BW-004", Name = "BudgetWheels Minivan", Category = VehicleCategory.Minivan, Provider = ProviderType.BudgetWheels.ToString(), DailyRate = 120m, IsAvailable = true, InsuranceType = InsuranceType.Basic }
+            new() { Id = "BW-001", Name = "BudgetWheels Economy", Category = VehicleCategory.Economy, Provider = ProviderType.BudgetWheels.ToString(), DailyRate = 70m, IsAvailable = true, InsuranceType = InsuranceType.Basic, CancellationPolicy = "Non-refundable bookings" },
+            new() { Id = "BW-002", Name = "BudgetWheels Compact", Category = VehicleCategory.Compact, Provider = ProviderType.BudgetWheels.ToString(), DailyRate = 80m, IsAvailable = true, InsuranceType = InsuranceType.Basic, CancellationPolicy = "Non-refundable bookings" },
+            new() { Id = "BW-003", Name = "BudgetWheels SUV", Category = VehicleCategory.SUV, Provider = ProviderType.BudgetWheels.ToString(), DailyRate = 100m, IsAvailable = false, InsuranceType = InsuranceType.Basic, CancellationPolicy = "Non-refundable bookings" },
+            new() { Id = "BW-004", Name = "BudgetWheels Minivan", Category = VehicleCategory.Minivan, Provider = ProviderType.BudgetWheels.ToString(), DailyRate = 120m, IsAvailable = true, InsuranceType = InsuranceType.Basic, CancellationPolicy = "Non-refundable bookings" }
         };
 
-        var filtered = vehicles.Where(vehicle => vehicle.IsAvailable);
-
         return request.Category.HasValue
-            ? filtered.Where(vehicle => vehicle.Category == request.Category.Value)
-            : filtered;
+            ? vehicles.Where(vehicle => vehicle.Category == request.Category.Value)
+            : vehicles;
     }
 
     public BookingResponse Book(BookingRequest request, PriceBreakdown priceBreakdown)

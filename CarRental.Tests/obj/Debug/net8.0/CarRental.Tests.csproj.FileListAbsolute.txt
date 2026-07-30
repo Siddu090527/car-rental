@@ -153,3 +153,13 @@ D:\car-rental\CarRental.Tests\obj\Debug\net8.0\refint\CarRental.Tests.dll
 D:\car-rental\CarRental.Tests\obj\Debug\net8.0\CarRental.Tests.pdb
 D:\car-rental\CarRental.Tests\obj\Debug\net8.0\CarRental.Tests.genruntimeconfig.cache
 D:\car-rental\CarRental.Tests\obj\Debug\net8.0\ref\CarRental.Tests.dll
+D:\car-rental\CarRental.Tests\bin\Debug\net8.0\Microsoft.Extensions.DependencyModel.dll
+D:\car-rental\CarRental.Tests\bin\Debug\net8.0\Serilog.dll
+D:\car-rental\CarRental.Tests\bin\Debug\net8.0\Serilog.AspNetCore.dll
+D:\car-rental\CarRental.Tests\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
+D:\car-rental\CarRental.Tests\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
+D:\car-rental\CarRental.Tests\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
+D:\car-rental\CarRental.Tests\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
+D:\car-rental\CarRental.Tests\bin\Debug\net8.0\Serilog.Sinks.Console.dll
+D:\car-rental\CarRental.Tests\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
+D:\car-rental\CarRental.Tests\bin\Debug\net8.0\Serilog.Sinks.File.dll

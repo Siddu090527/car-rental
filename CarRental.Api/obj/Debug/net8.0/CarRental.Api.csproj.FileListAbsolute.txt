@@ -144,3 +144,12 @@ D:\car-rental\CarRental.Api\obj\Debug\net8.0\refint\CarRental.Api.dll
 D:\car-rental\CarRental.Api\obj\Debug\net8.0\CarRental.Api.pdb
 D:\car-rental\CarRental.Api\obj\Debug\net8.0\CarRental.Api.genruntimeconfig.cache
 D:\car-rental\CarRental.Api\obj\Debug\net8.0\ref\CarRental.Api.dll
+D:\car-rental\CarRental.Api\bin\Debug\net8.0\Serilog.dll
+D:\car-rental\CarRental.Api\bin\Debug\net8.0\Serilog.AspNetCore.dll
+D:\car-rental\CarRental.Api\bin\Debug\net8.0\Serilog.Extensions.Hosting.dll
+D:\car-rental\CarRental.Api\bin\Debug\net8.0\Serilog.Extensions.Logging.dll
+D:\car-rental\CarRental.Api\bin\Debug\net8.0\Serilog.Formatting.Compact.dll
+D:\car-rental\CarRental.Api\bin\Debug\net8.0\Serilog.Settings.Configuration.dll
+D:\car-rental\CarRental.Api\bin\Debug\net8.0\Serilog.Sinks.Console.dll
+D:\car-rental\CarRental.Api\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
+D:\car-rental\CarRental.Api\bin\Debug\net8.0\Serilog.Sinks.File.dll

@@ -93,7 +93,34 @@ public class CarRentalBusinessRulesTests
         Assert.DoesNotContain(
             response.Vehicles,
             vehicle => vehicle.Provider == "BudgetWheels" &&
-                       vehicle.Id == "BW-003");
+                       vehicle.Id == "BW-003" &&
+                       vehicle.IsAvailable == false);
+
+        Assert.All(
+            response.Vehicles,
+            vehicle => Assert.True(vehicle.IsAvailable, "SearchService should filter unavailable vehicles before returning results."));
+    }
+
+    [Fact]
+    public void SearchService_IncludesCancellationPolicyInResults()
+    {
+        var searchService = new SearchService(new ICarRentalProvider[]
+        {
+            new PremiumDriveProvider(),
+            new BudgetWheelsProvider()
+        });
+
+        var response = searchService.Search(new CarSearchRequest
+        {
+            PickupLocation = "Hyderabad",
+            PickupDate = new DateTime(2026, 7, 20),
+            ReturnDate = new DateTime(2026, 7, 24)
+        });
+
+        Assert.Contains(
+            response.Vehicles,
+            vehicle => vehicle.Provider == "PremiumDrive" &&
+                       vehicle.CancellationPolicy == "Free cancellation up to 48 hours before pickup");
     }
 
     [Fact]
@@ -182,6 +209,61 @@ public class CarRentalBusinessRulesTests
             details.DriverName);
     }
 
+    [Fact]
+    public async Task BookingService_PreservesSelectedVehicleDetailsInBookingDetails()
+    {
+        var bookingService = CreateBookingService();
+
+        var request = CreateBookingRequest(
+            DocumentType.NationalId,
+            "Hyderabad");
+
+        var response = await bookingService.BookAsync(request);
+        var details = await bookingService.GetBookingDetailsAsync(
+            response.BookingReferenceNumber);
+
+        Assert.NotNull(details);
+        Assert.Equal(request.SelectedVehicle.Id, details!.SelectedVehicle.Id);
+        Assert.Equal(request.SelectedVehicle.Name, details.SelectedVehicle.Name);
+        Assert.Equal(request.SelectedVehicle.DailyRate, details.SelectedVehicle.DailyRate);
+        Assert.Equal(request.SelectedVehicle.InsuranceType, details.SelectedVehicle.InsuranceType);
+        Assert.Equal(request.SelectedVehicle.CancellationPolicy, details.SelectedVehicle.CancellationPolicy);
+    }
+
+    [Fact]
+    public async Task BookingService_ThrowsForMissingDocumentNumber()
+    {
+        var bookingService = CreateBookingService();
+        var request = CreateBookingRequest(
+            DocumentType.NationalId,
+            "Hyderabad");
+
+        request.DocumentNumber = string.Empty;
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => bookingService.BookAsync(request));
+    }
+
+    [Fact]
+    public async Task BookingService_ThrowsForInvalidSelectedVehicle()
+    {
+        var bookingService = CreateBookingService();
+        var request = CreateBookingRequest(
+            DocumentType.NationalId,
+            "Hyderabad");
+
+        request.SelectedVehicle = new ProviderVehicle
+        {
+            Id = string.Empty,
+            Name = string.Empty,
+            DailyRate = 0m,
+            Provider = "PremiumDrive"
+        };
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => bookingService.BookAsync(request));
+    }
+
     private static BookingRequest CreateBookingRequest(
         DocumentType documentType,
         string pickupLocation)
@@ -206,7 +288,8 @@ public class CarRentalBusinessRulesTests
                 Provider = "PremiumDrive",
                 DailyRate = 110m,
                 IsAvailable = true,
-                InsuranceType = InsuranceType.Comprehensive
+                InsuranceType = InsuranceType.Comprehensive,
+                CancellationPolicy = "Free cancellation up to 48 hours before pickup"
             },
 
             PickupDate = new DateTime(2026, 7, 20),

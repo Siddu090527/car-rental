@@ -32,6 +32,11 @@ public static class BookingMapper
             ReturnDate = details.ReturnDate,
             Provider = details.Provider.ToString(),
             VehicleId = details.SelectedVehicle.Id,
+            VehicleName = details.SelectedVehicle.Name,
+            VehicleCategory = details.SelectedVehicle.Category.ToString(),
+            DailyRate = details.SelectedVehicle.DailyRate,
+            InsuranceType = details.SelectedVehicle.InsuranceType.ToString(),
+            VehicleIsAvailable = details.SelectedVehicle.IsAvailable,
             TotalPrice = details.TotalPrice,
             CancellationPolicy = details.CancellationPolicy,
             DocumentNumber = details.DocumentNumber,
@@ -69,7 +74,18 @@ public static class BookingMapper
             DocumentType = documentType,
             SelectedVehicle = new ProviderVehicle
             {
-                Id = booking.VehicleId
+                Id = booking.VehicleId,
+                Name = booking.VehicleName,
+                Category = Enum.TryParse<VehicleCategory>(booking.VehicleCategory, true, out var category)
+                    ? category
+                    : VehicleCategory.Economy,
+                Provider = booking.Provider,
+                DailyRate = booking.DailyRate,
+                IsAvailable = booking.VehicleIsAvailable,
+                InsuranceType = Enum.TryParse<InsuranceType>(booking.InsuranceType, true, out var insurance)
+                    ? insurance
+                    : InsuranceType.Basic,
+                CancellationPolicy = booking.CancellationPolicy
             }
         };
     }

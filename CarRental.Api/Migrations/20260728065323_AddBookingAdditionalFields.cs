@@ -17,6 +17,15 @@ namespace CarRental.Api.Migrations
                 nullable: false,
                 defaultValue: "");
 
+            migrationBuilder.AddColumn<decimal>(
+                name: "DailyRate",
+                table: "Bookings",
+                type: "decimal(18,2)",
+                precision: 18,
+                scale: 2,
+                nullable: false,
+                defaultValue: 0m);
+
             migrationBuilder.AddColumn<string>(
                 name: "DocumentNumber",
                 table: "Bookings",
@@ -30,6 +39,34 @@ namespace CarRental.Api.Migrations
                 type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "InsuranceType",
+                table: "Bookings",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "VehicleCategory",
+                table: "Bookings",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "VehicleName",
+                table: "Bookings",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<bool>(
+                name: "VehicleIsAvailable",
+                table: "Bookings",
+                type: "bit",
+                nullable: false,
+                defaultValue: false);
         }
 
         /// <inheritdoc />
@@ -40,11 +77,31 @@ namespace CarRental.Api.Migrations
                 table: "Bookings");
 
             migrationBuilder.DropColumn(
+                name: "DailyRate",
+                table: "Bookings");
+
+            migrationBuilder.DropColumn(
                 name: "DocumentNumber",
                 table: "Bookings");
 
             migrationBuilder.DropColumn(
                 name: "DocumentType",
+                table: "Bookings");
+
+            migrationBuilder.DropColumn(
+                name: "InsuranceType",
+                table: "Bookings");
+
+            migrationBuilder.DropColumn(
+                name: "VehicleCategory",
+                table: "Bookings");
+
+            migrationBuilder.DropColumn(
+                name: "VehicleName",
+                table: "Bookings");
+
+            migrationBuilder.DropColumn(
+                name: "VehicleIsAvailable",
                 table: "Bookings");
         }
     }

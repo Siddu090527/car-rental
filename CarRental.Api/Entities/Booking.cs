@@ -29,6 +29,11 @@ public class Booking
 
     // Vehicle selected for the booking.
     public string VehicleId { get; set; } = string.Empty;
+    public string VehicleName { get; set; } = string.Empty;
+    public string VehicleCategory { get; set; } = string.Empty;
+    public decimal DailyRate { get; set; }
+    public string InsuranceType { get; set; } = string.Empty;
+    public bool VehicleIsAvailable { get; set; }
 
     // Rental provider.
     public string Provider { get; set; } = string.Empty;
